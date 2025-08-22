@@ -1,21 +1,28 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login } from './../services/auth.service';
 
 const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
+    const navigate = useNavigate();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         proceedToLogin(email, password);
     }
 
     const proceedToLogin = async (email, password) => {
-        const response = await login(email, password);
-        if (response.status === 200) {
-            console.log(response.data.user, response.data.message);
-            setEmail('');
-            setPassword('');
+        try {
+            const response = await login(email, password);
+            if (response.status === 200) {
+                setEmail('');
+                setPassword('');
+                navigate('/upload');
+            }
+        } catch (error) {
+            console.error(error);
+            alert(`${error.response.data.message || 'Something went wrong. Please try again after sometime.'}`);
         }
     }
 
@@ -30,7 +37,7 @@ const Login = () => {
                 <h2 className="mt-2 text-center text-2xl/9 font-bold tracking-tight text-white">Sign in to your account</h2>
             </div>
 
-            <div className="mt-10 w-5/12 bg-gray-800 p-12 rounded-xl">
+            <div className="mt-10 w-80 p-6 md:w-5/12 bg-gray-800 md:p-12 rounded-xl">
                 <form onSubmit={handleSubmit} className="space-y-7">
                     <div>
                         <label htmlFor="email" className="block text-sm/6 font-medium text-gray-100">
