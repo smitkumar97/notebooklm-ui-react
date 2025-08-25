@@ -49,7 +49,6 @@ const FileUpload = () => {
                 setError(null);
 
                 const response = await uploadFile(file);
-                console.log(response);
                 navigate(`/document/${response?.data?.docId}`);
             } catch (err) {
                 console.error('Upload error:', err);

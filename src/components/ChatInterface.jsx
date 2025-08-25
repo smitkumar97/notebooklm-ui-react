@@ -82,8 +82,6 @@ const ChatInterface = ({ suggestedQuestions, docId, setPageNumber }) => {
         } finally {
             setIsLoading(false);
             setIsAiTyping(false);
-            console.log(messages);
-
         }
     }
 
@@ -157,7 +155,11 @@ const ChatInterface = ({ suggestedQuestions, docId, setPageNumber }) => {
                                 <p className="text-xs mt-1 opacity-70 text-right">
                                     {message.timestamp}
                                 </p>
-                                {message.sender === 'ai' && <button className='btn-primary' onClick={() => setPageNumber(Number(message.page))}>Page: {message.page}</button>}
+                                {message.sender === 'ai' &&
+
+                                    message.page.map(page => (
+                                        <button className='btn-primary m-1' onClick={() => setPageNumber(Number(page))}>Page: {page}</button>
+                                    ))}
                             </div>
                         </div>
                     ))

@@ -9,9 +9,6 @@ export const login = async (email, password) => {
     password,
   });
 
-  if (response.status === 200) {
-    localStorage.setItem("accessToken", response.accessToken);
-  }
   return response;
 };
 
@@ -27,6 +24,12 @@ export const register = async (name, email, password) => {
 
 export const logout = async () => {
   const response = await axios.post(`${API_BASE_URL}/logout`);
-  localStorage.removeItem("accessToken");
+  return response;
+};
+
+export const signInWithGoole = async (code) => {
+  const response = await axios.post(`${API_BASE_URL}/google`, {
+    code: code,
+  });
   return response;
 };

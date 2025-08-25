@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getAllDocuments, getPdfUrl } from '../services/pdf.service';
 import PDFViewer from './PDFViewer';
 import ChatInterface from './ChatInterface';
+import { useAuth } from '../context/AuthContext';
 
 const Layout = () => {
+    const navigate = useNavigate();
     const { id } = useParams();
 
     const [document, setDocument] = useState(null);
     const [documentList, setDocumentList] = useState([]);
     const [pageNumber, setPageNumber] = useState(1);
+    const { authContextValue } = useAuth();
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -40,25 +43,44 @@ const Layout = () => {
         }
     }, [])
 
+    const proceedToLogout = () => {
+        authContextValue.logout();
+        navigate('/login')
+    }
 
     if (!document) return <>No document found</>
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
             {/* Header */}
-            <header className="bg-gray-800 p-3 border-b border-gray-700 flex justify-between items-center">
+            <header className="bg-gray-800 p-4 border-b border-gray-700 flex justify-between items-center">
                 <h1 className="text-lg font-semibold">{document?.name || 'Document'}</h1>
-                <button
-                    type="button"
-                    className={`px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 cursor-pointer`}
-                >
-                    <Link
-                        to="/"
-                        className="text-md font-bold tracking-tight"
+                <div>
+                    <button
+                        type="button"
+                        className={`px-4 py-2 mr-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 cursor-pointer`}
                     >
-                        New Upload
-                    </Link>
+                        <Link
+                            to="/upload"
+                            className="text-md font-bold tracking-tight"
+                        >
+                            Upload
+                        </Link>
 
-                </button>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={proceedToLogout}
+                        className={`px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 cursor-pointer`}
+                    >
+                        <Link
+                            to="/login"
+                            className="text-md font-bold tracking-tight"
+                        >
+                            Logout
+                        </Link>
+
+                    </button>
+                </div>
             </header>
 
             {/* Main Content */}

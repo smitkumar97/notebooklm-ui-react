@@ -1,21 +1,47 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from './../services/auth.service';
+import { login, signInWithGoole } from './../services/auth.service';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const navigate = useNavigate();
+    const { authContextValue } = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         proceedToLogin(email, password);
     }
 
+    const onLoginSuccess = async (codeResponse) => {
+        try {
+            if (codeResponse['code']) {
+                const result = await signInWithGoole(codeResponse['code']);
+                if (result.data.token) {
+                    authContextValue.login(result.data.token);
+                    navigate('/upload');
+                } else {
+                    alert('Access token is missing.')
+                }
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const googleLogin = useGoogleLogin({
+        flow: 'auth-code',
+        onSuccess: onLoginSuccess,
+        onError: onLoginSuccess,
+    });
+
     const proceedToLogin = async (email, password) => {
         try {
             const response = await login(email, password);
             if (response.status === 200) {
+                authContextValue.login(response.accessToken);
                 setEmail('');
                 setPassword('');
                 navigate('/upload');
@@ -103,6 +129,7 @@ const Login = () => {
                         <div className='w-5/12'>
                             <button
                                 type="submit"
+                                onClick={googleLogin}
                                 className="flex w-full justify-center rounded-md bg-gray-700 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
                             >
                                 <span className='pr-2'>
